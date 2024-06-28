@@ -2,7 +2,7 @@ It appears that there was an internal exception while trying to write the `READM
 
 I will write the content to a file and provide you with a link to download it.
 
-```plaintext
+
 # Flashcards App
 
 This is a Flashcards web application built with Flask, designed to help users learn Italian verbs through various interactive features.
