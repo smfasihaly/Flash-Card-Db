@@ -16,7 +16,6 @@ def create_app():
     app.register_blueprint(main_blueprint)
     
     with app.app_context():
-        print('table exist Now:',table_exists('words'))
         if table_exists('words'):
             import_data_from_excel(app.config['EXCEL_FILE_PATH'])
 
