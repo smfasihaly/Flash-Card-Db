@@ -1,23 +1,32 @@
 from flask import Flask
-from .models import db,Word
+from .models import db, Word  # Ensure models are imported
 from flashcards.config import Config  
+from flask_migrate import Migrate
 
-
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')  # Adjusted static_folder path
     app.config.from_object(Config)
     
     db.init_app(app)
-    
-    with app.app_context():
-        db.create_all()
-        import_data_from_excel(app.config['EXCEL_FILE_PATH'])
-        
+    migrate.init_app(app, db)
+     
     from .views import main as main_blueprint
     app.register_blueprint(main_blueprint)
     
+    with app.app_context():
+        print('table exist Now:',table_exists('words'))
+        if table_exists('words'):
+            import_data_from_excel(app.config['EXCEL_FILE_PATH'])
+
     return app
+
+def table_exists(table_name):
+    inspector = db.inspect(db.engine)
+    return inspector.has_table(table_name)
+
+
 
 def import_data_from_excel(file_path):
     import pandas as pd

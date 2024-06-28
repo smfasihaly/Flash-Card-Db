@@ -62,6 +62,12 @@ Flash-Card-Db/
     ```bash
     pip install -r requirements.txt
     ```
+4. Set up the database:
+    ```bash
+    flask db init
+    flask db migrate -m "Initial migration"
+    flask db upgrade
+    ```
 
 5. Run the application:
     ```bash
