@@ -47,8 +47,8 @@ flashcards/
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/flashcards.git
-    cd flashcards
+    git clone https://github.com/smfasihaly/Flash-Card-Db.git
+    cd Flash-Card-Db
     ```
 
 2. Create a virtual environment:
