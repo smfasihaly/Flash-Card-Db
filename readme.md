@@ -19,25 +19,26 @@ This is a Flashcards web application built with Flask, designed to help users le
 ## Project Structure
 
 ```plaintext
-flashcards/
-├── app/
-│   ├── __init__.py
-│   ├── controllers.py
-│   ├── models.py
-│   └── views.py
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   ├── js/
-│   │   └── script.js
-│   └── images/
-│       └── logo.png
-├── templates/
-│   └── index.html
-├── data/
-│   └── words.xlsx
-├── config.py
-├── db.sqlite3
+Flash-Card-Db/
+├── flashcards/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── controllers.py
+│   │   ├── models.py
+│   │   └── views.py
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── style.css
+│   │   ├── js/
+│   │   │   └── script.js
+│   │   └── images/
+│   │       └── logo.png
+│   ├── templates/
+│   │   └── index.html
+│   ├── data/
+│   │   └── words.xlsx
+│   ├── config.py
+│   ├── db.sqlite3
 ├── app.py
 ├── requirements.txt
 └── README.md

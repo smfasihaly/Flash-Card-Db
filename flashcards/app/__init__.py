@@ -1,6 +1,8 @@
 from flask import Flask
-from flashcards.config import Config
 from .models import db,Word
+from flashcards.config import Config  
+
+
 
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')  # Adjusted static_folder path
