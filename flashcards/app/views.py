@@ -5,11 +5,14 @@ import random
 from .models import db, Word, User, JustFlipped, Failure
 
 main = Blueprint('main', __name__)
-
+words_list = []
 @main.route('/')
 def index():
+    global words_list
     user_logged_in = 'user' in session
     username = session['user'] if user_logged_in else ''
+    words_list = Word.query.all()
+    random.shuffle(words_list)
     return render_template('index.html', user_logged_in=user_logged_in, username=username)
 
 @main.route('/get_verbs')
@@ -18,12 +21,17 @@ def get_verbs():
         return jsonify({"error": "User not logged in", "data": []}), 401  # 401 Unauthorized
 
     page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 9))
-    words = Word.query.paginate(page=page, per_page=per_page, error_out=False)
-    total_pages = words.pages
+    per_page = int(request.args.get('per_page', 9))        
+
+    total_words = len(words_list)
+    total_pages = (total_words + per_page - 1) // per_page
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    paginated_words = words_list[start:end]
 
     response_data = {
-        'verbs': [{'Italian': word.italian, 'English': word.english} for word in words.items],
+        'verbs': [{'Italian': word.italian, 'English': word.english} for word in paginated_words],
         'total_pages': total_pages,
         'current_page': page
     }

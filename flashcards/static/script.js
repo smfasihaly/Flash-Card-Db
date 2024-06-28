@@ -513,4 +513,3 @@ function updateStatsPanel() {
     document.getElementById('stats-failure').textContent = stats.failure;
     document.getElementById('stats-just-flipped').textContent = stats.justFlipped;
 }
-
