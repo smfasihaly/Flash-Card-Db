@@ -1,8 +1,9 @@
 from flask import render_template, jsonify, request, session, Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+
 import random
 from .models import db, Word, User, JustFlipped, Failure
+from .controllers import *
 
 main = Blueprint('main', __name__)
 words_list = []
@@ -11,7 +12,7 @@ def index():
     global words_list
     user_logged_in = 'user' in session
     username = session['user'] if user_logged_in else ''
-    words_list = Word.query.all()
+    words_list = WordsController.get_all_words()
     random.shuffle(words_list)
     return render_template('index.html', user_logged_in=user_logged_in, username=username)
 
@@ -43,7 +44,7 @@ def get_verbs_from_sheet(sheet_name):
         return jsonify({"error": "User not logged in"}), 401
 
     username = session['user']
-    user = User.query.filter_by(username=username).first()
+    user = UsersController.get_user_by_username(username)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
@@ -81,21 +82,17 @@ def save_stats():
     failure = stats_data.get('failure', [])
     language_direction = stats_data.get('languageDirection')
     username = session['user']
-    user = User.query.filter_by(username=username).first()
+    user = UsersController.get_user_by_username(username)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    for item in just_flipped:
-        if not JustFlipped.query.filter_by(italian=item['Italian'], english=item['English'], user_id=user.id, language_direction=language_direction).first():
-            new_just_flipped = JustFlipped(italian=item['Italian'], english=item['English'], user_id=user.id, language_direction=language_direction)
-            db.session.add(new_just_flipped)
+    for verb in just_flipped:
+        JustFlippedController.add_just_flipped(verb['Italian'], verb['English'], user.id, language_direction)
+  
 
-    for item in failure:
-        if not Failure.query.filter_by(italian=item['Italian'], english=item['English'], user_id=user.id, language_direction=language_direction).first():
-            new_failure = Failure(italian=item['Italian'], english=item['English'], user_id=user.id, language_direction=language_direction)
-            db.session.add(new_failure)
-
-    db.session.commit()
+    for verb in failure:
+        FailureController.add_failure(verb['Italian'], verb['English'], user.id, language_direction)
+  
     return jsonify({"status": "success"})
 
 @main.route('/signup', methods=['POST'])
@@ -104,12 +101,14 @@ def signup():
     username = user_data.get('username')
     password = user_data.get('password')
 
-    if User.query.filter_by(username=username).first():
+    if UsersController.get_user_by_username(username):
         return jsonify({"error": "Username already exists"}), 400
 
-    new_user = User(username=username, password=generate_password_hash(password),role='user')
-    db.session.add(new_user)
-    db.session.commit()
+    new_user = UsersController.add_user({
+        'username': username,
+        'password': password,
+        'role': 'user'
+    })
 
     return jsonify({"status": "success"})
 
@@ -119,11 +118,9 @@ def login():
     username = user_data.get('username')
     password = user_data.get('password')
 
-    user = User.query.filter_by(username=username).first()
-    if user and check_password_hash(user.password, password):
+    user = UsersController.authenticate_user(username, password)
+    if user:
         session['user'] = username  # Set session for the logged-in user
-        user.last_login = datetime.utcnow()
-        db.session.commit()
         return jsonify({"status": "success"})
     else:
         return jsonify({"error": "Invalid username or password"}), 400
@@ -139,7 +136,7 @@ def remove_verb():
     verb = data['verb']
     sheet_name = data['sheetName']
     username = session['user']
-    user = User.query.filter_by(username=username).first()
+    user = UsersController.get_user_by_username(username)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
