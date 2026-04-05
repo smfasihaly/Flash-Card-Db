@@ -1,6 +1,4 @@
-It appears that there was an internal exception while trying to write the `README.md` file. Let's attempt a different method to ensure the file is written correctly.
 
-I will write the content to a file and provide you with a link to download it.
 
 
 # Flashcards App
